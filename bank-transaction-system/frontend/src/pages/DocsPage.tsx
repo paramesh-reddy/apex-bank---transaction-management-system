@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, Database, ShieldCheck, CheckCircle2, Code2, Server } from 'lucide-react';
+import { ExternalLink, Database, ShieldCheck, Code2, Server } from 'lucide-react';
 
 export const DocsPage: React.FC = () => {
   return (
@@ -19,7 +19,7 @@ export const DocsPage: React.FC = () => {
           </p>
         </div>
         <a
-          href="/docs"
+          href="http://localhost:8000/docs"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-400 hover:bg-emerald-300 text-slate-950 transition-colors shadow-sm shrink-0"

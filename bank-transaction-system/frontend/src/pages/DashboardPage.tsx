@@ -9,19 +9,20 @@ import {
   ArrowDownLeft, 
   ArrowUpRight,
   TrendingUp,
-  ExternalLink,
   ChevronRight
 } from 'lucide-react';
 import { accountService, Account, AccountMetrics } from '../services/accountService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface DashboardPageProps {
+  revision: number;
   onOpenCreateAccount: () => void;
   onOpenTransaction: (type?: 'credit' | 'debit', accountId?: string) => void;
   onOpenTransfer: (sourceAccountId?: string) => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
+  revision,
   onOpenCreateAccount,
   onOpenTransaction,
   onOpenTransfer,
@@ -48,7 +49,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [revision]);
 
   return (
     <div className="space-y-6">

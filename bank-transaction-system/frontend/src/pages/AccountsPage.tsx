@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Wallet, ArrowDownLeft, ArrowUpRight, ArrowLeftRight, ChevronRight, Copy, Check } from 'lucide-react';
+import { Plus, Search, Wallet, ChevronRight, Copy, Check } from 'lucide-react';
 import { accountService, Account } from '../services/accountService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface AccountsPageProps {
+  revision: number;
   onOpenCreateAccount: () => void;
   onOpenTransaction: (type?: 'credit' | 'debit', accountId?: string) => void;
   onOpenTransfer: (sourceAccountId?: string) => void;
 }
 
 export const AccountsPage: React.FC<AccountsPageProps> = ({
+  revision,
   onOpenCreateAccount,
   onOpenTransaction,
   onOpenTransfer,
@@ -34,7 +36,7 @@ export const AccountsPage: React.FC<AccountsPageProps> = ({
 
   useEffect(() => {
     fetchAccounts();
-  }, []);
+  }, [revision]);
 
   const handleCopy = (id: string) => {
     navigator.clipboard.writeText(id);

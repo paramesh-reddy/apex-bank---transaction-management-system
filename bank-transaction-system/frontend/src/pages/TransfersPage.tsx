@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeftRight, CheckCircle2, ShieldAlert, Plus, Calendar, FileText } from 'lucide-react';
+import { ArrowLeftRight, CheckCircle2 } from 'lucide-react';
 import { transferService, Transfer } from '../services/transferService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface TransfersPageProps {
+  revision: number;
   onOpenTransfer: () => void;
 }
 
-export const TransfersPage: React.FC<TransfersPageProps> = ({ onOpenTransfer }) => {
+export const TransfersPage: React.FC<TransfersPageProps> = ({ revision, onOpenTransfer }) => {
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,7 +26,7 @@ export const TransfersPage: React.FC<TransfersPageProps> = ({ onOpenTransfer }) 
 
   useEffect(() => {
     loadTransfers();
-  }, []);
+  }, [revision]);
 
   return (
     <div className="space-y-6">

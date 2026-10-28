@@ -18,11 +18,13 @@ import { TransactionTable } from '../components/TransactionTable';
 import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface AccountDetailsPageProps {
+  revision: number;
   onOpenTransaction: (type?: 'credit' | 'debit', accountId?: string) => void;
   onOpenTransfer: (sourceAccountId?: string) => void;
 }
 
 export const AccountDetailsPage: React.FC<AccountDetailsPageProps> = ({
+  revision,
   onOpenTransaction,
   onOpenTransfer,
 }) => {
@@ -47,7 +49,7 @@ export const AccountDetailsPage: React.FC<AccountDetailsPageProps> = ({
       setError(null);
       const acc = await accountService.getAccount(accountId);
       setAccount(acc);
-    } catch (err: any) {
+    } catch {
       setError('Account not found or invalid UUID.');
     } finally {
       setLoading(false);
@@ -71,11 +73,11 @@ export const AccountDetailsPage: React.FC<AccountDetailsPageProps> = ({
 
   useEffect(() => {
     fetchAccount();
-  }, [accountId]);
+  }, [accountId, revision]);
 
   useEffect(() => {
     fetchTransactions();
-  }, [accountId, page, pageSize]);
+  }, [accountId, page, pageSize, revision]);
 
   const handleCopy = () => {
     if (accountId) {

@@ -1,19 +1,8 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Apex Bank & Transaction Management System
 
+The application is in `bank-transaction-system`.
 
-This contains everything you need to run your app locally.
+- `bank-transaction-system/backend` — FastAPI API
+- `bank-transaction-system/frontend` — React app
 
-View your app in AI Studio: https://ai.studio/apps/97ea2b93-f1b3-451f-89c7-e29b5694d0e6
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+See `bank-transaction-system/README.md` for setup.

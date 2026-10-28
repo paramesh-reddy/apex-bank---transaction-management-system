@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
@@ -21,19 +21,25 @@ export default function App() {
   const [transactionType, setTransactionType] = useState<'credit' | 'debit'>('credit');
   const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>();
   const [accounts, setAccounts] = useState<Account[]>([]);
+  const [revision, setRevision] = useState(0);
 
   const loadAccounts = async () => {
     try {
       const data = await accountService.getAccounts(0, 100);
       setAccounts(data.items);
     } catch (err) {
-      console.error('Failed to load accounts in App:', err);
+      console.error('Failed to load accounts', err);
     }
   };
 
   useEffect(() => {
     loadAccounts();
   }, []);
+
+  const refreshData = () => {
+    loadAccounts();
+    setRevision((n) => n + 1);
+  };
 
   const handleOpenTransaction = (type: 'credit' | 'debit' = 'credit', accountId?: string) => {
     setTransactionType(type);
@@ -68,6 +74,7 @@ export default function App() {
                 path="/"
                 element={
                   <DashboardPage
+                    revision={revision}
                     onOpenCreateAccount={() => setCreateAccountOpen(true)}
                     onOpenTransaction={handleOpenTransaction}
                     onOpenTransfer={handleOpenTransfer}
@@ -78,6 +85,7 @@ export default function App() {
                 path="/accounts"
                 element={
                   <AccountsPage
+                    revision={revision}
                     onOpenCreateAccount={() => setCreateAccountOpen(true)}
                     onOpenTransaction={handleOpenTransaction}
                     onOpenTransfer={handleOpenTransfer}
@@ -88,6 +96,7 @@ export default function App() {
                 path="/accounts/:accountId"
                 element={
                   <AccountDetailsPage
+                    revision={revision}
                     onOpenTransaction={handleOpenTransaction}
                     onOpenTransfer={handleOpenTransfer}
                   />
@@ -95,7 +104,7 @@ export default function App() {
               />
               <Route
                 path="/transfers"
-                element={<TransfersPage onOpenTransfer={() => handleOpenTransfer()} />}
+                element={<TransfersPage revision={revision} onOpenTransfer={() => handleOpenTransfer()} />}
               />
               <Route path="/docs-info" element={<DocsPage />} />
             </Routes>
@@ -106,7 +115,7 @@ export default function App() {
         <CreateAccountModal
           isOpen={createAccountOpen}
           onClose={() => setCreateAccountOpen(false)}
-          onSuccess={() => loadAccounts()}
+          onSuccess={refreshData}
         />
 
         <TransactionModal
@@ -115,7 +124,7 @@ export default function App() {
           initialAccountId={selectedAccountId}
           accounts={accounts}
           onClose={() => setTransactionModalOpen(false)}
-          onSuccess={() => loadAccounts()}
+          onSuccess={refreshData}
         />
 
         <TransferModal
@@ -123,7 +132,7 @@ export default function App() {
           initialSourceAccountId={selectedAccountId}
           accounts={accounts}
           onClose={() => setTransferModalOpen(false)}
-          onSuccess={() => loadAccounts()}
+          onSuccess={refreshData}
         />
       </div>
     </BrowserRouter>

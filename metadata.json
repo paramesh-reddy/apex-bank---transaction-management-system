@@ -1,6 +1,0 @@
-{
-  "name": "Apex Bank & Transaction Management System",
-  "description": "Production-grade bank account and transaction management system with atomic balance consistency, transfers, and real-time dashboard powered by Neon PostgreSQL and FastAPI.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

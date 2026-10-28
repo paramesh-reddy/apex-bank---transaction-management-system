@@ -1,4 +1,6 @@
 import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -14,8 +16,7 @@ from core.exceptions import (
 )
 from api.v1.router import api_router
 from core.database import engine, Base
-# Ensure all models are loaded so Base.metadata knows about them
-import models  # noqa: F401
+import models  # noqa: F401  # registers tables on Base.metadata
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,22 +24,29 @@ logging.basicConfig(
 )
 logger = logging.getLogger("bank_system")
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    logger.info("Starting %s", settings.PROJECT_NAME)
+    try:
+        # Alembic is the source of truth. create_all only fills in if
+        # someone starts the API before running migrations.
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database connection ok")
+    except Exception:
+        logger.exception("Could not reach the database on startup")
+    yield
+    logger.info("Shutting down")
+
+
 app = FastAPI(
     title="Apex Bank Account & Transaction Management System",
-    description=(
-        "Production-minded Bank Account and Transaction Management API.\n\n"
-        "### Key Architecture Features:\n"
-        "- **ACID Atomicity & Consistency**: Single database transaction for balance updates and transaction records.\n"
-        "- **Pessimistic Row Locking (`SELECT ... FOR UPDATE`)**: Protects accounts from overdrafts during concurrent transactions.\n"
-        "- **Deadlock-Free Concurrent Transfers**: Account rows are deterministically locked in ascending UUID order.\n"
-        "- **Transaction Immutability**: Append-only transactional history with zero update or delete endpoints.\n"
-        "- **Arbitrary Precision Arithmetic**: 100% `Decimal` calculations; floats are forbidden for financial computations.\n"
-        "- **PostgreSQL on Neon Cloud**: Native integration using Psycopg 3 driver with serverless connection pooling.\n"
-    ),
+    description="Account, transaction, and transfer API. Balances use Decimal and row locks.",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -56,7 +64,6 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
-# Include API v1 router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
@@ -67,14 +74,3 @@ def health_check():
         "app": settings.PROJECT_NAME,
         "environment": settings.APP_ENV,
     }
-
-
-@app.on_event("startup")
-def on_startup():
-    logger.info("Initializing Apex Bank backend application...")
-    # Optional auto-creation of tables if migrations have not been applied yet
-    try:
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database schemas verified successfully.")
-    except Exception as e:
-        logger.error(f"Error checking database tables: {e}")
